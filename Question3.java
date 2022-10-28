@@ -1,44 +1,71 @@
 package Assignment3;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.testng.annotations.BeforeClass;
+import org.openqa.selenium.support.ui.Select;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class Question3 {
-	public WebDriver driver;
-	@BeforeClass()
-	public void beforeclass() {
-		System.setProperty("webdriver.chrome.driver","C:\\Users\\Utsav Sharma\\eclipse-workspace\\SeleniumAssignment3\\src\\test\\resources\\chromedriver.exe");
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
-	    driver.get("https://www.path2usa.com/travel-companion/");
-	}
-	@Test(priority=1)
-	public void check() {
-		driver.findElement(By.id("form-field-travel_from")).sendKeys("Delhi");
-		driver.findElement(By.id("form-field-travel_to")).sendKeys("Chicago");
-//		List <WebElement> travel = driver.findElements(By.xpath("(//input[@class=\"elementor-field elementor-size-sm elementor-field-textual ui-autocomplete-input\"])[2]"));
-//		for(WebElement e: travel) {
-//			System.out.println(e.getSize());
-//		}
-		
-	}
-	@Test(priority=2)
-	public void clicked() {
-		WebElement datecheck =driver.findElement(By.xpath("//div//input[@id=\"form-field-travel_comp_date\"]"));
-//		Actions actions = new Actions(driver);
-//		actions.moveToElement(datecheck).click().build().perform();
-		datecheck.click();
-	}
 
-	
+public class Question3 {
+    public WebDriver driver;
+    public Actions action;
+
+    @BeforeMethod
+    public void Browser() {
+    	System.setProperty("webdriver.chrome.driver","C:\\Users\\Utsav Sharma\\eclipse-workspace\\SeleniumAssignment3\\src\\test\\resources\\chromedriver.exe");
+        driver = new ChromeDriver();
+        driver = new ChromeDriver();
+        driver.manage().window().maximize();
+        driver.get("https://www.path2usa.com/travel-companion/");
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        action = new Actions(driver);
+    }
+
+    @Test
+    public void Automate_travel() {
+        driver.findElement(By.xpath("(//input[@type='text'])[1]")).sendKeys("New Delhi");
+        driver.findElement(By.xpath("(//input[@type='text'])[2]"))
+                .sendKeys("Chicago Midway International Airport (MDW) Chicago");
+        driver.findElement(By.xpath("(//input[@type='text'])[3]")).sendKeys(Keys.ENTER);
+        driver.findElement(By.xpath("(//span[@class='flatpickr-day '])[9]")).sendKeys(Keys.ENTER);
+        Select date_between = new Select(driver.findElement(By.id("form-field-travel_comp_date_between")));
+        date_between.selectByIndex(3);
+        Select airLine = new Select(driver.findElement(By.id("form-field-travel_comp_airline")));
+        airLine.selectByIndex(2);
+        Select language = new Select(driver.findElement(By.id("form-field-travel_comp_language")));
+        language.selectByValue("Hindi");
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView();",
+                driver.findElement(By.xpath("//*[@id='p2u-travel-companion-wrap']/div/div[1]/div/div[1]/div[1]/h2")));
+
+        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        try {
+            FileUtils.copyFile(screenshot,
+                    new File("D:\\selenium_assignment\\assignment3\\src\\img\\searchResult.png"));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    @AfterMethod
+    public void Close() {
+        driver.close();
+    }
+
 }
